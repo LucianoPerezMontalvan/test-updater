@@ -5,3 +5,5 @@
 !/src/scripts/*.js
 !/src/*.html
 !/package.json
+!/compiler.js
+!/updater.js
