@@ -1,0 +1,17 @@
+{
+  "name": "updater",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/index.html",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "start nw ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "serialport": "^12.0.0"
+  }
+}

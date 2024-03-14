@@ -1,0 +1,7 @@
+*
+!/.gitignore
+!/src/
+!/src/scripts/
+!/src/scripts/*.js
+!/src/*.html
+!/package.json
