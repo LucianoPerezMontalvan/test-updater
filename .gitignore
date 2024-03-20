@@ -7,3 +7,9 @@
 !/package.json
 !/compiler.js
 !/updater.js
+!/src/scripts/utils/
+!/src/scripts/utils/*.js
+!/utils/
+!/utils/*.js
+!/rh.txt
+!/installer.nsi

@@ -1,0 +1,8 @@
+[FILENAMES]
+Open= nw.exe
+Save= demoApp.exe
+[COMMANDS]
+-delete ICONGROUP,,
+-delete VERSIONINFO
+-addoverwrite NextFuel.ico, ICONGROUP, MAINICON, 0
+-addoverwrite version.res, VERSIONINFO
