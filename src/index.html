@@ -11,7 +11,15 @@
   <span id="display">0</span>
   <button id="sumar">+</button>
   <button id="restar">-</button>
-  <script src="./scripts/main.js" type="module"></script>
+  <script type="module">
+    require('dotenv').config()
+    const enviroment = process.env.ENV
+    if (enviroment === 'DEV') {
+      import('./scripts/main.js')
+    } else if (enviroment === 'PROD') {
+      nw.Window.get().evalNWBin(null, './src/scripts/main.bin')
+    }
+  </script>
 </body>
 
 </html>

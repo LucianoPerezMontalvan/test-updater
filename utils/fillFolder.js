@@ -2,19 +2,12 @@ import { join } from 'node:path'
 import fs from 'node:fs/promises'
 const __dirname = import.meta.dirname
 
-const filtrarArchivos = (archivosProyecto, archivosIgnorados) => {
-  return archivosProyecto.filter(archivo => {
-    if(archivosIgnorados.includes(archivo)){
-      return false
-    }
-
-    for (const ruta of archivosIgnorados) {
-      if(archivo.startsWith(ruta)){
-        return false
-      }
-    }
-    return true
-  })
+const copyFile = async (source, destination, recursive) => {
+  try {
+    await fs.cp(source, destination, {recursive})
+  } catch (error) {
+    throw error
+  }
 }
 
 const deleteFile = async (path) => {
@@ -61,7 +54,8 @@ const fillCompileFolder = async (folderName, paths) => {
       await createFolder(proyectPath)
     }
     for (const file of paths) {
-      await fs.cp(file, join(proyectPath, file.replace('./', '/')), {recursive: true})
+      const fullPath = join(proyectPath, file.replace('./', '/'))
+      await copyFile(file, fullPath, true)
     }
   } catch (error) {
     console.log(error);
@@ -74,5 +68,5 @@ export {
   createFolder,
   deleteFolder,
   deleteFile,
-  filtrarArchivos
+  copyFile
 }

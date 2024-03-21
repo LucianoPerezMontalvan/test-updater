@@ -22,7 +22,7 @@ LoadLanguageFile "${NSISDIR}\Contrib\Language files\Spanish.nlf"
 
 Section
   SetOutPath $INSTDIR
-  File /r "compilado\demoApp\*"
+  File /r "compilado\proyect\*"
   WriteUninstaller "$INSTDIR\uninstaller.exe"
 SectionEnd
 

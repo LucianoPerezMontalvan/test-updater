@@ -1,25 +1,48 @@
 import fs from 'node:fs/promises'
-const readPath = async (path, files) => {
+import { join } from 'node:path'
+
+const shouldIgnore = (elementName, toIgnores) => {
+  return toIgnores.includes(elementName)
+}
+
+const readPath = async (path, ignore = []) => {
   try {
+    let files = []
     const elements = await fs.readdir(path)
-    for (const element of elements) {
-      const elementPath = `${path}/${element}`
-      const stats = await fs.stat(elementPath)
+    
+    for (const pathName of elements) {
+      const fullPath = join(path, pathName)
+      const stats = await fs.stat(fullPath)
+      
       if (stats.isDirectory()) {
-        await readPath(elementPath, files)
+        if(ignore.length > 0){
+          if(!shouldIgnore(pathName, ignore)){
+            const nestedFiles = await readPath(fullPath, ignore);
+            files = files.concat(nestedFiles);
+          }
+        } else {
+          const nestedFiles = await readPath(fullPath, ignore);
+          files = files.concat(nestedFiles);
+        }
       } else if(stats.isFile()) {
-        files.push(elementPath)
+        if(ignore.length > 0){
+          if(!shouldIgnore(pathName, ignore)){
+            files.push(fullPath)
+          }
+        } else {
+          files.push(fullPath)
+        }
       }
     }
+    return files
   } catch (error) {
     console.log(error);
   }
 }
 
-const loadModules = async (origin) => {
+const loadModules = async (origin, ignorePaths) => {
   try {
-    const modules = []
-    await readPath(origin, modules)
+    const modules = await readPath(origin, ignorePaths)
     return modules
   } catch (error) {
     console.log(error);

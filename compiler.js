@@ -1,17 +1,67 @@
 import makeQuestion from './utils/makeQuestion.js'
 import actualizarPackage from './utils/updatePackage.js'
 import loadModules from './utils/getModules.js'
-import { deleteFile, fillCompileFolder, filtrarArchivos } from './utils/fillFolder.js'
+import { deleteFile, fillCompileFolder, copyFile} from './utils/fillFolder.js'
 import { exec } from 'node:child_process' 
+import { join } from 'node:path'
 const compilePath = "compilado"
 const __dirname = import.meta.dirname
+
+const createInstaller = async (path) => {
+  try {
+    const nsisPath = '"C:\\Program Files (x86)\\NSIS\\makensis.exe"'
+    exec(`${nsisPath} ../installer.nsi`, {cwd: path}, (err, succ)=>{
+      if(err){
+        throw err
+      } else {
+        console.log(succ);
+      }
+    })
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const genExe = async (proyectPath) => {
+  try {
+    const rhPath = 'C:\\Program Files (x86)\\Resource Hacker\\ResourceHacker.exe'
+    //-open nw.exe -save demoApp.exe -action addoverwrite -res NextFuel.ico -mask ICONGROUP,MAINICON, -action addoverwrite -res version.res
+    const command = "-open nw.exe -save demoApp.exe -action addoverwrite -res NextFuel.ico -mask ICONGROUP,MAINICON,"
+    exec(`"${rhPath}" ${command}`, {cwd: proyectPath}, (err, succ)=>{
+      if(err){
+        console.log(err);
+        throw err
+      } else {
+        createInstaller(compilePath)
+      }
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const loadVersion = async (proyectPath) => {
+  try {
+    const rhPath = 'C:\\Program Files (x86)\\Resource Hacker\\ResourceHacker.exe'
+    exec(`"${rhPath}" -open version.rc -save version.res -action compile -log NUL`, {cwd: proyectPath}, (error, succ)=> {
+      if(error){
+        throw error
+      } else {
+        exec('del version.rc', {cwd: proyectPath})
+        genExe(proyectPath)
+      }
+    })
+  } catch (error) {
+   console.log(error); 
+  }
+}
 
 const installDependencies = (path)  => {
   exec('npm install',{cwd: path}, (error, stdout) => {
     if(error){
       console.log(error);
     } else {
-      console.log(stdout);
+      loadVersion(path)
     }
   })
 }
@@ -35,12 +85,16 @@ const createBinaries = (paths) => {
 
 const ignore = [
   '.git',
-  './compilado',
-  './test-updater',
+  'compilado.js',
+  'test-updater',
   '.env',
   '.gitignore',
   'package-lock.json',
-  'compiler.js'
+  'compiler.js',
+  'node_modules',
+  'utils',
+  'src',
+  "test.js"
 ]
 
 const startCompilation = async () => {
@@ -50,18 +104,20 @@ const startCompilation = async () => {
     if(upload){
       await actualizarPackage('./package.json')
     }
-    const proyectFiles = await loadModules(__dirname)
-    const filtered = filtrarArchivos(proyectFiles, ignore)
-    console.log(filtered);
-
-    // const modules = await loadModules('./src')
-    // await fillCompileFolder(compilePath, modules)
+    const modules = await loadModules('./src')
+    await fillCompileFolder(compilePath, modules)
+    const proyectFiles = await loadModules(__dirname, ignore)
+    for (const file of proyectFiles) {
+      const filePath = file
+      const copyPath = join(file.replace('updater', `updater/${compilePath}/proyect`))
+      await copyFile(filePath, copyPath, true)
+    }
     
-    // const proyectModules = await loadModules('./compilado/proyect/src')
-    // const finish = createBinaries(proyectModules)
-    // if(finish){
-    //   installDependencies('./compilado/proyect')
-    // }
+    const proyectModules = await loadModules('./compilado/proyect/src')
+    const finish = createBinaries(proyectModules)
+    if(finish){
+      installDependencies('./compilado/proyect')
+    }
   } catch (error) {
     console.log(error);
   }

@@ -13,3 +13,5 @@
 !/utils/*.js
 !/rh.txt
 !/installer.nsi
+!/NextFuel.ico
+!/version.rc
