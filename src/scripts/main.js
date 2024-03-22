@@ -10,5 +10,4 @@ sumar.addEventListener('click', ()=>{
 restar.addEventListener('click', ()=>{
     display.innerText = parseInt(display.innerText) - 1
 })
-
 update.start()

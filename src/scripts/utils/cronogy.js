@@ -16,7 +16,10 @@ const update = new CronJob('*/10 * * * * *', async ()=>{
     console.log(update);
     
     if(update == 1){
-      alert(`A new version is available \n link: ${link}`)
+      Swal.fire({
+        title: 'Update Available',
+        html: `<a href="${link}">${newVersion}</a>`,
+      })
     }
   } catch (error) {
     console.log(error);
